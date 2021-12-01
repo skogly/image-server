@@ -1,0 +1,43 @@
+image: mcr.microsoft.com/dotnet/sdk:6.0-alpine
+
+stages:
+  - build
+  - test
+  - deploy-dev
+  - deploy-prod
+
+before_script:
+  - "dotnet restore"
+
+build:
+  stage: build
+  script:
+    - "dotnet build"
+
+test:
+  stage: test
+  script:
+    - "dotnet test"
+
+deploy-dev:
+  image: ubuntu:20.04
+  stage: deploy-dev
+  before_script:
+    - echo "Prepare deployment to dev"
+  script:
+    - echo "Deploying application to dev"
+  environment:
+    name: dev
+    url: https://dev.ubuntu/dev
+
+deploy-prod:
+  image: ubuntu:20.04
+  stage: deploy-prod
+  before_script:
+    - echo "Prepare deployment to prod"
+  script:
+    - echo "Deploying application to prod"
+  environment:
+    name: prod
+    url: https://dev.ubuntu/prod
+  when: manual

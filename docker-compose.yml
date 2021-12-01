@@ -1,0 +1,15 @@
+imageserver-dev:
+  image: "imageserver-dev"
+  container_name: imageserver-dev
+  restart: always
+  hostname: "if_needed"
+  ports:
+    - "PORT:80"
+  volumes:
+    - "/full/path/to/image/directory:/mnt/images"
+    - "/full/path/to/be/created/mobile/directory:/mnt/mobile"
+    - "/full/path/to/be/created/thumbnails/directory:/mnt/thumbnails"
+  environment:
+    ImageFolder: /mnt/images
+    MobileFolder: /mnt/mobile
+    ThumbnailFolder: /mnt/thumbnails
