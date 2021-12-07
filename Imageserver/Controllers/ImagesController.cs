@@ -18,14 +18,14 @@ namespace ImageServer.Controllers
             return imageFiles;
         }
 
-        [HttpGet("updateImages")]
+        [HttpGet("update")]
         public ActionResult UpdateImageFiles()
         {
             _imageService.UpdateImages();
             return Ok();
         }
 
-        [HttpPost("getThumbnailImage")]
+        [HttpPost("thumbnail")]
         public ActionResult GetThumbnailImageByPath([FromBody] JsonRequest jsonRequest)
         {
             string path = jsonRequest.Path;
@@ -34,7 +34,7 @@ namespace ImageServer.Controllers
             return Ok();
         }
 
-        [HttpPost("getMobileImage")]
+        [HttpPost("mobile")]
         public ActionResult GetMedResImageByPath([FromBody] JsonRequest jsonRequest)
         {
             string path = jsonRequest.Path;
@@ -43,7 +43,7 @@ namespace ImageServer.Controllers
             return Ok();
         }
 
-        [HttpPost("getFullResImage")]
+        [HttpPost("image")]
         public ActionResult GetHiResImageByPath([FromBody] JsonRequest jsonRequest)
         {
             string path = jsonRequest.Path;
@@ -52,14 +52,14 @@ namespace ImageServer.Controllers
             return Ok();
         }
 
-        [HttpPost("uploadImage")]
+        [HttpPost("upload")]
         public async Task<ActionResult> UploadImage([FromForm] ImageRequest imageRequest)
         {
             await _imageService.SaveImage(imageRequest);
             return Ok();
         }
 
-        [HttpPost("deleteImage")]
+        [HttpPost("delete")]
         public async Task<ActionResult> DeleteImage([FromBody] JsonRequest jsonRequest)
         {
             string path = jsonRequest.Path;
