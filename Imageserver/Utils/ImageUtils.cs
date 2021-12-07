@@ -1,8 +1,8 @@
 ﻿namespace Imageserver.Utils
 {
-    public static class ImageUtils
+    public class ImageUtils : IImageUtils
     {
-        public static int CreateResizedImage(string path, string imageFolder, string saveFolder, int maxPixels, IFileRepository fileRepository, ILogger logger)
+        public int CreateResizedImage(string path, string imageFolder, string saveFolder, int maxPixels, IFileRepository fileRepository, ILogger logger)
         {
             var savePath = "";
 
@@ -80,7 +80,7 @@
             return 0;
         }
 
-        private static (int width, int height) CalculateWidthAndHeight(int imageWidth, int imageHeight, int maxPixels)
+        private (int width, int height) CalculateWidthAndHeight(int imageWidth, int imageHeight, int maxPixels)
         {
             double width, height;
             if (imageWidth > imageHeight)
