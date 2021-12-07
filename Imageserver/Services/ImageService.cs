@@ -5,6 +5,7 @@
         private readonly IFileRepository _fileRepository;
         private readonly IHubContext<ImageHub> _hubContext;
         private readonly ILogger<IImageService> _logger;
+        private readonly IImageUtils _imageUtils;
         private static IList<string> _imageFiles;
         private static int imagesProcessed = 0;
         private readonly string imageDir;
@@ -12,12 +13,13 @@
         private readonly string thumbnailDir;
         private readonly string[] imageExtensions;
 
-        public ImageService(IConfiguration configuration, IFileRepository fileRepository,
+        public ImageService(IConfiguration configuration, IFileRepository fileRepository, IImageUtils imageUtils,
                             ILogger<IImageService> logger, IHubContext<ImageHub> hubContext)
         {
             _fileRepository = fileRepository;
             _hubContext = hubContext;
             _logger = logger;
+            _imageUtils = imageUtils;
             imageDir = configuration["ImageFolder"];
             mobileDir = configuration["MobileFolder"];
             thumbnailDir = configuration["ThumbnailFolder"];
@@ -154,42 +156,25 @@
         private void CreateResizedImages(string path)
         {
             var errors = 0;
-            errors += ImageUtils.CreateResizedImage(path, imageDir, thumbnailDir, maxPixels: 200, _fileRepository, _logger);
-            errors += ImageUtils.CreateResizedImage(path, imageDir, mobileDir, maxPixels: 1000, _fileRepository, _logger);
+            errors += _imageUtils.CreateResizedImage(path, imageDir, thumbnailDir, maxPixels: 200, _fileRepository, _logger);
+            errors += _imageUtils.CreateResizedImage(path, imageDir, mobileDir, maxPixels: 1000, _fileRepository, _logger);
 
             if (HasNoErrors(errors))
             {
-                _imageFiles.Add(GetImagePath(path));
+                AddImage(path);
+            }
+        }
+
+        private void AddImage(string path)
+        {
+            if (path.StartsWith(imageDir, StringComparison.CurrentCultureIgnoreCase))
+            {
+                string trimmedImagePath = path.Substring(imageDir.Length).TrimStart(Path.DirectorySeparatorChar);
+                _imageFiles.Add(trimmedImagePath);
                 imagesProcessed++;
                 if (imagesProcessed % 100 == 0)
                 {
                     _logger.LogInformation($"{imagesProcessed} images processed at {DateTime.Now.ToString("HH:mm:ss")}");
-                }
-            }
-        }
-
-        private string GetImagePath(string path)
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                var tempPath = string.Join("\\", path.Split("\\").Skip(2).ToList());
-                if (File.Exists(Path.Combine(imageDir, tempPath))) {
-                    return string.Join("\\", path.Split("\\").Skip(2).ToList());
-                } else
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                var tempPath = string.Join("/", path.Split("/").Skip(3).ToList());
-                if (File.Exists(Path.Combine(imageDir, tempPath)))
-                {
-                    return string.Join("/", path.Split("/").Skip(3).ToList());
-                }
-                else
-                {
-                    return null;
                 }
             }
         }
