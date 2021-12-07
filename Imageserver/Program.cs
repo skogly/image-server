@@ -15,6 +15,7 @@ builder.Services.Configure<KestrelServerOptions>(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
+builder.Services.AddTransient<IImageUtils, ImageUtils>();
 builder.Services.AddSingleton<IFileRepository, FileRepository>();
 builder.Services.AddSingleton<IImageService, ImageService>();
 
