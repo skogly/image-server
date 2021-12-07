@@ -6,5 +6,6 @@
         Stream GetFileAsStream(string path);
         void CreateDirectory(string path);
         void DeletePath(string path);
+        bool CheckIfPathExists(string path);
     }
 }

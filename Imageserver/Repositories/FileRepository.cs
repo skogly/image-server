@@ -30,5 +30,10 @@
                 Directory.Delete(path, true);
             }
         }
+
+        public bool CheckIfPathExists(string path)
+        {
+            return File.Exists(path);
+        }
     }
 }
