@@ -8,6 +8,7 @@
         private readonly IImageUtils _imageUtils;
         private static IList<string> _imageFiles;
         private static int imagesProcessed = 0;
+        private static object imageListlock = new object();
         private readonly string imageDir;
         private readonly string mobileDir;
         private readonly string thumbnailDir;
@@ -90,13 +91,14 @@
 
         public async Task DeleteImage(string path)
         {
-            if (_imageFiles.Contains(path) == false)
+            if (_imageFiles.Any(x => x.Contains(path)) == false)
             {
                 _logger.LogError($"Error deleting image. Image path is not a known path. Path: {path}");
                 return;
             }
             var directories = new List<string>() { imageDir, mobileDir, thumbnailDir };
 
+            _logger.LogInformation($"Received request to delete: {path}");
             foreach (string directory in directories)
             {
                 var pathToDelete = Path.Combine(directory, path);
@@ -170,11 +172,14 @@
             if (path.StartsWith(imageDir, StringComparison.CurrentCultureIgnoreCase))
             {
                 string trimmedImagePath = path.Substring(imageDir.Length).TrimStart(Path.DirectorySeparatorChar);
-                _imageFiles.Add(trimmedImagePath);
-                imagesProcessed++;
-                if (imagesProcessed % 100 == 0)
+                lock(imageListlock)
                 {
-                    _logger.LogInformation($"{imagesProcessed} images processed at {DateTime.Now.ToString("HH:mm:ss")}");
+                    _imageFiles.Add(trimmedImagePath);
+                    imagesProcessed++;
+                    if (imagesProcessed % 100 == 0)
+                    {
+                        _logger.LogInformation($"{imagesProcessed} images processed at {DateTime.Now.ToString("HH:mm:ss")}");
+                    }
                 }
             }
         }
